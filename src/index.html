@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧课堂助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --secondary-dark: #059669;
+            --accent: #f43f5e;
+            --accent-dark: #e11d48;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --grey-100: #f1f5f9;
+            --grey-200: #e2e8f0;
+            --grey-300: #cbd5e1;
+            --grey-400: #94a3b8;
+            --grey-500: #64748b;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            --radius-sm: 0.25rem;
+            --radius: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-full: 9999px;
+
+            --transition: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--dark);
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            position: relative;
+            padding: 1.5rem 0 0.5rem 0;
+            background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);
+            color: white;
+            box-shadow: none;
+            z-index: 10;
+            overflow: visible;
+            margin-bottom: 2rem;
+        }
+
+        .header:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+            transform: rotate(-15deg);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .app-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            letter-spacing: -0.5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .app-title:after {
+            content: '智慧课堂';
+            position: absolute;
+            top: -0.5rem;
+            right: -3rem;
+            font-size: 0.8rem;
+            background: var(--accent);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-sm);
+            transform: rotate(10deg);
+            opacity: 0.95;
+        }
+
+        .app-tagline {
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .tabs-container {
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0rem;
+            z-index: 12;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background-color: rgba(79, 70, 229, 0.8);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none;
+        }
+
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .tab.active {
+            background-color: white;
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tab.active::after {
+            display: none;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab i {
+            font-size: 1rem;
+        }
+
+        .main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 2rem;
+            background-color: transparent;
+            position: relative;
+            z-index: 9;
+        }
+
+        .content-area {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            min-height: 600px;
+            margin-top: 0;
+            padding-top: 1rem;
+        }
+
+        .section {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+            padding: 1.5rem;
+        }
+
+        .section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--grey-500);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .card-content {
+            margin-bottom: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+        }
+
+        .col-12 {
+            grid-column: span 12;
+        }
+
+        .col-8 {
+            grid-column: span 8;
+        }
+
+        .col-6 {
+            grid-column: span 6;
+        }
+
+        .col-4 {
+            grid-column: span 4;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--dark);
+            background-color: var(--light);
+            background-clip: padding-box;
+            border: 1px solid var(--grey-300);
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-success {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--accent-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--grey-200);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--grey-300);
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-block {
+            display: flex;
+            width: 100%;
+        }
+
+        .fancy-btn {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .fancy-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));
+            transform: skewX(-25deg) translateX(-100%);
+            transition: all 0.8s ease;
+            z-index: -1;
+        }
+
+        .fancy-btn:hover::before {
+            transform: skewX(-25deg) translateX(100%);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* 文件上传样式 */
+        .custom-file-upload {
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-name {
+            margin-left: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--grey-500);
+        }
+
+        /* 历史列表样式 */
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--grey-200);
+        }
+
+        .history-list li {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--grey-200);
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .history-list li:last-child {
+            border-bottom: none;
+        }
+
+        .history-list li:hover {
+            background-color: var(--grey-100);
+        }
+
+        .history-list li:before {
+            content: '\f007';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: 0.75rem;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        /* 点名显示区域样式 */
+        .roll-call-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .roll-call-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 2rem 1rem 2rem;
+            text-align: center;
+            min-height: 200px;
+        }
+
+        .display-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--grey-400);
+            margin-bottom: 0.5rem;
+        }
+
+        .display-placeholder i {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        .display-placeholder p {
+            font-size: 1.1rem;
+        }
+
+        .selected-student {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 0.5rem;
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* 刮刮乐样式 */
+        .scratch-card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .card-wrapper {
+            width: 300px;
+            height: 200px;
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin: 1rem 0;
+        }
+
+        #scratch-card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: grabbing;
+        }
+
+        #scratch-card-result {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #edf2f7 100%);
+        }
+
+        /* 反馈动画 */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-5px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        .pulse {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 992px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+
+            .main {
+                padding: 1.5rem;
+            }
+
+            .header {
+                padding: 1.2rem 0;
+            }
+
+            .app-title {
+                font-size: 1.8rem;
+            }
+
+            .card-wrapper {
+                width: 280px;
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .btn-lg {
+                width: 100%;
+            }
+        }
+
+        /* 精美滑块样式 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: var(--grey-200);
+            outline: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 0 0 10px rgba(79, 70, 229, 0.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border: 0;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 0 0 10px rgba(79, 70, 229, 0.1);
+        }
+
+        /* 精美滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--grey-100);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--grey-300);
+            border-radius: var(--radius-full);
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--grey-400);
+        }
+
+        /* 无内容时的样式 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--grey-400);
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+        }
+
+        /* 卡片页脚样式 */
+        .card-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--grey-200);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .prize-item {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--grey-200);
+        }
+
+        .prize-item .btn-small {
+            padding: 0.25rem 0.5rem;
+            height: 38px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">课堂助手</h1>
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <button class="tab active" data-section="rollcall">
+                            <i class="fas fa-random"></i> 随机点名
+                        </button>
+                        <button class="tab" data-section="scratchcard">
+                            <i class="fas fa-gift"></i> 刮刮乐
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="content-area">
+                <!-- 随机点名部分 -->
+                <section id="rollcall" class="section active">
+                    <div class="two-columns">
+                        <div class="left-column">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-users"></i> 学生名单</h3>
+                                </div>
+                                <div class="card-content">
+                                    <div class="form-group">
+                                        <textarea id="student-list" class="form-control"
+                                            placeholder="请输入学生名单，每行一个名字..."></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="custom-file-upload">
+                                            <input type="file" id="file-input" accept=".csv,.txt,.xlsx">
+                                            <span class="btn btn-secondary">
+                                                <i class="fas fa-file-upload"></i> 导入名单文件
+                                            </span>
+                                        </label>
+                                        <span id="file-name" class="file-name"></span>
+                                    </div>
+
+                                    <button id="save-list" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> 保存名单
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-history"></i> 点名历史</h3>
+                                </div>
+                                <div class="card-content">
+                                    <ul id="history-list" class="history-list"></ul>
+                                </div>
+                                <div class="card-footer">
+                                    <button id="reset-history" class="btn btn-secondary">
+                                        <i class="fas fa-redo"></i> 重置历史
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="right-column">
+                            <div class="card roll-call-card">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-random"></i> 点名区</h3>
+                                </div>
+                                <div class="card-content roll-call-display">
+                                    <div id="roll-call-display">
+                                        <div class="display-placeholder">
+                                            <i class="fas fa-user-graduate"></i>
+                                            <p>点击下方按钮开始随机点名</p>
+                                        </div>
+                                        <div id="selected-student" class="selected-student"></div>
+                                    </div>
+                                </div>
+                                <div class="action-bar">
+                                    <button id="roll-call-btn" class="btn btn-primary btn-lg fancy-btn">
+                                        <i class="fas fa-random"></i> 随机点名
+                                    </button>
+
+                                    <button id="show-3d-sphere" class="btn btn-success btn-lg fancy-btn">
+                                        <i class="fas fa-globe"></i> 3D名字球体
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 刮刮乐部分 -->
+                <section id="scratchcard" class="section">
+                    <div class="two-columns">
+                        <div class="left-column">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-gift"></i> 奖品设置</h3>
+                                </div>
+                                <div class="card-content">
+                                    <div id="prize-list">
+                                        <!-- 这里将显示多个奖品项 -->
+                                        <div class="prize-item">
+                                            <div class="form-group">
+                                                <label>奖品名称</label>
+                                                <input type="text" class="prize-name" placeholder="输入奖品名称" value="一等奖">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>奖品数量</label>
+                                                <input type="number" class="prize-count" min="1" value="1">
+                                            </div>
+                                            <button class="btn btn-small btn-secondary remove-prize">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-secondary" id="add-prize-btn">
+                                        <i class="fas fa-plus"></i> 添加奖品
+                                    </button>
+
+                                    <div class="action-bar">
+                                        <button class="btn btn-primary" id="save-prizes-btn">
+                                            <i class="fas fa-save"></i> 保存设置
+                                        </button>
+                                        <button class="btn btn-success" id="start-lottery-btn">
+                                            <i class="fas fa-play"></i> 开刮
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="right-column">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-gift"></i> 刮刮乐抽奖</h3>
+                                </div>
+                                <div class="card-content scratch-card-container">
+                                    <div class="card-wrapper">
+                                        <div id="scratch-card-result"></div>
+                                        <canvas id="scratch-card"></canvas>
+                                    </div>
+
+                                    <button id="new-card-btn" class="btn btn-primary btn-lg fancy-btn">
+                                        <i class="fas fa-sync"></i> 新刮刮卡
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2023 智慧课堂助手 | 专业课堂互动工具</p>
+        </footer>
+    </div>
+
+    <div id="confetti-container"></div>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/rollcall.js"></script>
+    <script src="../js/scratchcard.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // 标签切换功能
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                // 切换标签活动状态
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // 切换内容区域
+                const sectionId = this.getAttribute('data-section');
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // 按钮反馈效果
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mousedown', function () {
+                this.style.transform = 'scale(0.98)';
+            });
+
+            btn.addEventListener('mouseup', function () {
+                this.style.transform = '';
+            });
+
+            btn.addEventListener('mouseleave', function () {
+                this.style.transform = '';
+            });
+        });
+
+        // 刮刮乐概率滑块
+        const probabilitySlider = document.getElementById('prize-probability');
+        const probabilityValue = document.getElementById('probability-value');
+
+        if (probabilitySlider && probabilityValue) {
+            probabilitySlider.addEventListener('input', function () {
+                probabilityValue.textContent = this.value + '%';
+            });
+        }
+
+        // 文件上传显示文件名
+        const fileInput = document.getElementById('file-input');
+        const fileNameSpan = document.getElementById('file-name');
+
+        if (fileInput && fileNameSpan) {
+            fileInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    fileNameSpan.textContent = this.files[0].name;
+                } else {
+                    fileNameSpan.textContent = '';
+                }
+            });
+        }
+
+        // 初始化空名单提示
+        const studentList = document.getElementById('student-list');
+        if (!studentList.value.trim()) {
+            const savedStudents = localStorage.getItem('studentNames');
+            if (savedStudents) {
+                try {
+                    const students = JSON.parse(savedStudents);
+                    studentList.value = students.join('\n');
+                } catch (e) {
+                    console.error('解析保存的名单失败', e);
+                }
+            }
+        }
+
+        // 3D球体页面跳转功能
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM已加载完成，开始绑定3D球体事件');
+            const sphere3dBtn = document.getElementById('show-3d-sphere');
+
+            if (!sphere3dBtn) {
+                console.error('找不到3D名字球按钮元素!');
+                return;
+            }
+
+            sphere3dBtn.addEventListener('click', function () {
+                console.log('3D名字球按钮被点击');
+                // 获取学生列表
+                const studentListElem = document.getElementById('student-list');
+                if (!studentListElem) {
+                    console.error('找不到学生名单文本框!');
+                    return;
+                }
+
+                const studentListText = studentListElem.value;
+                if (studentListText.trim() === '') {
+                    alert('请先输入或导入学生名单！');
+                    this.classList.add('shake');
+                    setTimeout(() => {
+                        this.classList.remove('shake');
+                    }, 500);
+                    return;
+                }
+
+                // 分割学生名单并存储到localStorage
+                const studentNames = studentListText.split('\n')
+                    .map(name => name.trim())
+                    .filter(name => name !== '');
+
+                console.log('保存到localStorage的学生名单:', studentNames);
+                try {
+                    localStorage.setItem('studentNames', JSON.stringify(studentNames));
+                    console.log('学生名单已成功保存到localStorage');
+                } catch (e) {
+                    console.error('保存学生名单到localStorage失败:', e);
+                }
+
+                // 添加过渡动画
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在跳转...';
+
+                // 跳转到3D球体页面
+                setTimeout(() => {
+                    window.location.href = 'sphere.html';
+                }, 300);
+            });
+
+            console.log('3D球体事件绑定完成');
+        });
+
+        // 保存学生名单
+        document.getElementById('save-list').addEventListener('click', function () {
+            const studentText = document.getElementById('student-list').value.trim();
+            if (!studentText) {
+                alert('请先输入学生名单！');
+                return;
+            }
+
+            const students = studentText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name !== '');
+
+            localStorage.setItem('studentNames', JSON.stringify(students));
+
+            // 保存成功效果
+            this.innerHTML = '<i class="fas fa-check"></i> 已保存';
+            this.classList.add('pulse');
+
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-save"></i> 保存名单';
+                this.classList.remove('pulse');
+            }, 1500);
+        });
+
+        // Excel文件导入功能增强
+        fileInput.addEventListener('change', async function (e) {
+            if (!this.files || !this.files[0]) return;
+
+            const file = this.files[0];
+            fileNameSpan.textContent = file.name;
+
+            try {
+                const fileType = file.name.toLowerCase().endsWith('.xlsx') ? 'excel' :
+                    file.name.toLowerCase().endsWith('.csv') ? 'csv' : 'text';
+                let studentNames = [];
+
+                if (fileType === 'excel') {
+                    const data = await file.arrayBuffer();
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                    // 尝试解析带有头部的Excel
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                    if (jsonData && jsonData.length > 0) {
+                        // 假设第一列是学生姓名
+                        studentNames = jsonData
+                            .slice(1) // 跳过标题行
+                            .map(row => row[0]?.toString().trim())
+                            .filter(name => name);
+
+                        // 如果解析失败，尝试直接获取第一列
+                        if (studentNames.length === 0) {
+                            studentNames = jsonData
+                                .map(row => row[0]?.toString().trim())
+                                .filter(name => name);
+                        }
+                    }
+                } else if (fileType === 'csv') {
+                    const text = await file.text();
+                    // 处理不同的换行符
+                    const lines = text.split(/\r\n|\n/);
+                    studentNames = lines
+                        .map(line => {
+                            // 从CSV行中提取第一列
+                            const columns = line.split(',');
+                            return columns[0]?.trim();
+                        })
+                        .filter(name => name);
+                } else {
+                    const text = await file.text();
+                    studentNames = text.split(/\r\n|\n/)
+                        .map(name => name.trim())
+                        .filter(name => name);
+                }
+
+                if (studentNames.length > 0) {
+                    // 添加到文本区域并滚动到底部显示内容
+                    document.getElementById('student-list').value = studentNames.join('\n');
+
+                    // 显示成功消息
+                    const saveButton = document.getElementById('save-list');
+                    saveButton.innerHTML = '<i class="fas fa-check"></i> 已导入';
+                    saveButton.classList.add('pulse');
+
+                    setTimeout(() => {
+                        saveButton.innerHTML = '<i class="fas fa-save"></i> 保存名单';
+                        saveButton.classList.remove('pulse');
+                    }, 1500);
+                } else {
+                    alert('未能从文件中解析出学生名单，请检查文件格式');
+                }
+            } catch (error) {
+                console.error('解析文件失败:', error);
+                alert('解析文件失败，请检查文件格式');
+            } finally {
+                // 重置文件输入框，确保能够再次选择同一文件
+                this.value = '';
+            }
+        });
+
+        // 刮刮乐相关功能
+        (function () {
+            const prizeList = document.getElementById('prize-list');
+            const addPrizeBtn = document.getElementById('add-prize-btn');
+            const savePrizesBtn = document.getElementById('save-prizes-btn');
+            const startLotteryBtn = document.getElementById('start-lottery-btn');
+
+            // 加载已保存的奖品
+            function loadSavedPrizes() {
+                try {
+                    const savedPrizes = localStorage.getItem('lotteryPrizes');
+                    if (savedPrizes) {
+                        const prizes = JSON.parse(savedPrizes);
+
+                        // 清空现有列表
+                        prizeList.innerHTML = '';
+
+                        // 添加保存的奖品项
+                        prizes.forEach(prize => {
+                            addPrizeItem(prize.name, prize.count);
+                        });
+                    } else {
+                        // 没有保存的奖品，保留默认项
+                        if (prizeList.children.length === 0) {
+                            addPrizeItem('一等奖', 1);
+                        }
+                    }
+                } catch (error) {
+                    console.error('加载奖品数据失败:', error);
+                    // 出错时显示默认项
+                    prizeList.innerHTML = '';
+                    addPrizeItem('一等奖', 1);
+                }
+            }
+
+            // 添加奖品项
+            function addPrizeItem(name = '', count = 1) {
+                const prizeItem = document.createElement('div');
+                prizeItem.className = 'prize-item';
+                prizeItem.innerHTML = `
+                    <div class="form-group">
+                        <label>奖品名称</label>
+                        <input type="text" class="prize-name" placeholder="输入奖品名称" value="${name}">
+                    </div>
+                    <div class="form-group">
+                        <label>奖品数量</label>
+                        <input type="number" class="prize-count" min="1" value="${count}">
+                    </div>
+                    <button class="btn btn-small btn-secondary remove-prize">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+
+                // 添加删除功能
+                const removeBtn = prizeItem.querySelector('.remove-prize');
+                removeBtn.addEventListener('click', function () {
+                    if (document.querySelectorAll('.prize-item').length > 1) {
+                        prizeItem.remove();
+                    } else {
+                        alert('至少需要保留一个奖品!');
+                    }
+                });
+
+                prizeList.appendChild(prizeItem);
+            }
+
+            // 收集所有奖品数据
+            function collectPrizeData() {
+                const prizeItems = document.querySelectorAll('.prize-item');
+                const prizes = [];
+
+                prizeItems.forEach(item => {
+                    const nameInput = item.querySelector('.prize-name');
+                    const countInput = item.querySelector('.prize-count');
+
+                    const name = nameInput.value.trim();
+                    const count = parseInt(countInput.value) || 1;
+
+                    if (name) {
+                        prizes.push({ name, count });
+                    }
+                });
+
+                return prizes;
+            }
+
+            // 添加奖品按钮
+            addPrizeBtn.addEventListener('click', function () {
+                addPrizeItem();
+            });
+
+            // 保存设置
+            savePrizesBtn.addEventListener('click', function () {
+                const prizes = collectPrizeData();
+
+                if (prizes.length === 0) {
+                    alert('请至少添加一个奖品！');
+                    return;
+                }
+
+                // 保存到localStorage
+                localStorage.setItem('lotteryPrizes', JSON.stringify(prizes));
+
+                // 显示成功提示
+                alert('奖品设置已保存！');
+            });
+
+            // 开始刮刮乐
+            startLotteryBtn.addEventListener('click', function () {
+                const prizes = collectPrizeData();
+
+                if (prizes.length === 0) {
+                    alert('请至少添加一个奖品！');
+                    return;
+                }
+
+                // 保存到localStorage
+                localStorage.setItem('lotteryPrizes', JSON.stringify(prizes));
+
+                // 跳转到刮刮乐页面
+                window.location.href = 'scratch.html';
+            });
+
+            // 为删除按钮添加事件处理
+            document.querySelectorAll('.remove-prize').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    if (document.querySelectorAll('.prize-item').length > 1) {
+                        this.closest('.prize-item').remove();
+                    } else {
+                        alert('至少需要保留一个奖品!');
+                    }
+                });
+            });
+
+            // 初始加载
+            loadSavedPrizes();
+        })();
+    </script>
+</body>
+
+</html>

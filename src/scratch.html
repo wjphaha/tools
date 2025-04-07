@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刮刮乐抽奖</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --grey-100: #f3f4f6;
+            --grey-200: #e5e7eb;
+            --grey-300: #d1d5db;
+            --grey-400: #9ca3af;
+            --grey-800: #1f2937;
+            --radius: 0.5rem;
+            --radius-lg: 1rem;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--grey-100);
+            color: var(--grey-800);
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .scratch-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2.5rem;
+            margin-bottom: 5rem;
+        }
+
+        .scratch-card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            aspect-ratio: 1/1.3;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .scratch-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .scratch-card canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .prize-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 1;
+            padding: 1rem;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .prize-icon {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .prize-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            background-color: transparent;
+            padding: 1rem 0;
+            box-shadow: none;
+            z-index: 10;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--grey-200);
+            color: var(--grey-800);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--grey-300);
+        }
+
+        @media (max-width: 768px) {
+            .scratch-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scratch-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="scratch-grid" id="scratch-grid">
+            <!-- 八个刮刮乐卡片，一排四个，共两排 -->
+            <!-- 将由JavaScript动态生成 -->
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-secondary" id="back-btn">
+                <i class="fas fa-arrow-left"></i> 返回设置
+            </button>
+            <button class="btn" id="reset-btn">
+                <i class="fas fa-sync"></i> 重置刮刮乐
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const scratchGrid = document.getElementById('scratch-grid');
+            const backBtn = document.getElementById('back-btn');
+            const resetBtn = document.getElementById('reset-btn');
+
+            // 检查必要元素是否存在
+            if (!scratchGrid) {
+                console.error('找不到scratch-grid元素');
+                return;
+            }
+
+            if (!backBtn) {
+                console.error('找不到back-btn元素');
+            } else {
+                // 返回按钮
+                backBtn.addEventListener('click', function () {
+                    window.location.href = 'index.html';
+                });
+            }
+
+            if (!resetBtn) {
+                console.error('找不到reset-btn元素');
+            } else {
+                // 重置按钮
+                resetBtn.addEventListener('click', function () {
+                    createScratchCards();
+                });
+            }
+
+            // 从localStorage获取奖品数据
+            let prizes = [];
+            try {
+                const savedPrizes = localStorage.getItem('lotteryPrizes');
+                if (savedPrizes) {
+                    prizes = JSON.parse(savedPrizes);
+                }
+            } catch (error) {
+                console.error('获取奖品数据出错:', error);
+            }
+
+            // 如果没有奖品数据，使用默认奖品
+            if (!prizes || prizes.length === 0) {
+                prizes = [
+                    { name: '一等奖', count: 1 },
+                    { name: '二等奖', count: 2 },
+                    { name: '三等奖', count: 3 },
+                    { name: '谢谢参与', count: 10 }
+                ];
+            }
+
+            // 创建所有奖品的数组
+            let createScratchCards = function () {
+                // 清空现有卡片
+                scratchGrid.innerHTML = '';
+
+                let allPrizes = [];
+                prizes.forEach(prize => {
+                    for (let i = 0; i < prize.count; i++) {
+                        allPrizes.push(prize.name);
+                    }
+                });
+
+                // 确保有足够的奖品，不足的用"谢谢参与"补充
+                while (allPrizes.length < 8) {
+                    allPrizes.push('谢谢参与');
+                }
+
+                // 随机打乱奖品
+                allPrizes = shuffleArray(allPrizes.slice(0, 8));
+
+                // 奖品图标映射
+                const prizeIcons = {
+                    '一等奖': 'trophy',
+                    '二等奖': 'medal',
+                    '三等奖': 'award',
+                    '谢谢参与': 'smile-wink'
+                };
+
+                // 生成刮刮乐卡片
+                for (let i = 0; i < 8; i++) {
+                    const prize = allPrizes[i];
+                    // 确定图标
+                    let icon = 'gift'; // 默认图标
+
+                    // 根据奖品名称判断应该用什么图标
+                    for (const [key, value] of Object.entries(prizeIcons)) {
+                        if (prize.includes(key)) {
+                            icon = value;
+                            break;
+                        }
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'scratch-card';
+                    card.innerHTML = `
+                        <div class="prize-content">
+                            <i class="fas fa-${icon} prize-icon"></i>
+                            <div class="prize-name">${prize}</div>
+                        </div>
+                        <canvas style="opacity: 1;"></canvas>
+                    `;
+                    scratchGrid.appendChild(card);
+                }
+
+                // 初始化刮刮乐功能
+                setTimeout(() => {
+                    initScratchCards();
+                }, 0); // 使用0毫秒延迟，确保DOM操作完成后立即执行
+            };
+
+            // 初始化刮刮乐卡片功能
+            function initScratchCards() {
+                const cards = document.querySelectorAll('.scratch-card');
+
+                cards.forEach(card => {
+                    const canvas = card.querySelector('canvas');
+                    const prizeIcon = card.querySelector('.prize-icon');
+                    const prizeName = card.querySelector('.prize-name');
+
+                    // 根据奖品名称长度调整字体大小
+                    if (prizeName.textContent.length > 5) {
+                        prizeName.style.fontSize = '1.2rem';
+                    }
+
+                    // 设置奖品图标样式
+                    if (prizeName.textContent.includes('一等')) {
+                        prizeIcon.className = 'fas fa-trophy prize-icon';
+                        prizeIcon.style.color = '#FFD700'; // 金色
+                    } else if (prizeName.textContent.includes('二等')) {
+                        prizeIcon.className = 'fas fa-medal prize-icon';
+                        prizeIcon.style.color = '#C0C0C0'; // 银色
+                    } else if (prizeName.textContent.includes('三等')) {
+                        prizeIcon.className = 'fas fa-award prize-icon';
+                        prizeIcon.style.color = '#CD7F32'; // 铜色
+                    } else if (prizeName.textContent.includes('谢谢')) {
+                        prizeIcon.className = 'fas fa-smile-wink prize-icon';
+                        prizeIcon.style.color = '#888888';
+                    }
+
+                    // 立即设置刮刮层，确保不显示奖品内容
+                    canvas.style.opacity = '1';
+
+                    // 等待元素尺寸计算完成
+                    setTimeout(() => {
+                        // 设置canvas大小
+                        const rect = card.getBoundingClientRect();
+                        canvas.width = rect.width;
+                        canvas.height = rect.height;
+
+                        // 创建刮刮乐效果
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#CCCCCC';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        // 添加"刮开"文字
+                        ctx.font = 'bold 22px Microsoft YaHei';
+                        ctx.fillStyle = '#333333';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('刮开查看', canvas.width / 2, canvas.height / 2);
+                        ctx.font = '16px Microsoft YaHei';
+                        ctx.fillText('- 试试手气 -', canvas.width / 2, canvas.height / 2 + 30);
+                    }, 10); // 缩短延迟时间，确保尽快绘制刮刮层
+
+                    // 添加刮卡事件
+                    let isDrawing = false;
+
+                    function handleStart(e) {
+                        isDrawing = true;
+                        draw(e);
+                    }
+
+                    function handleMove(e) {
+                        if (!isDrawing) return;
+                        draw(e);
+                    }
+
+                    function handleEnd() {
+                        isDrawing = false;
+                    }
+
+                    function draw(e) {
+                        e.preventDefault();
+                        const rect = canvas.getBoundingClientRect();
+                        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                        const x = clientX - rect.left;
+                        const y = clientY - rect.top;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 25, 0, Math.PI * 2); // 增大刮擦半径
+                        ctx.fill();
+
+                        // 刮开一小部分后显示奖品内容
+                        const prizeContent = card.querySelector('.prize-content');
+                        if (prizeContent.style.visibility !== 'visible') {
+                            prizeContent.style.visibility = 'visible';
+                            prizeContent.style.opacity = '1';
+                        }
+
+                        // 计算已刮开的百分比，如果超过50%则完全显示
+                        calculateRevealedPercentage(canvas, ctx);
+                    }
+
+                    // 计算已刮开的百分比
+                    function calculateRevealedPercentage(canvas, ctx) {
+                        try {
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const pixels = imageData.data;
+                            let transparentPixels = 0;
+
+                            // 每四个值代表一个像素点的RGBA
+                            for (let i = 3; i < pixels.length; i += 4) {
+                                // 如果Alpha通道接近透明，则认为该像素点已被刮开
+                                if (pixels[i] < 50) {
+                                    transparentPixels++;
+                                }
+                            }
+
+                            // 计算百分比
+                            const totalPixels = canvas.width * canvas.height;
+                            const revealedPercentage = (transparentPixels / totalPixels) * 100;
+
+                            // 如果刮开面积超过30%，完全显示奖品
+                            if (revealedPercentage > 30) {
+                                // 清除整个画布，完全显示奖品
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            }
+                        } catch (e) {
+                            // 忽略跨域错误等
+                            console.log('计算刮开百分比时出错:', e.message);
+                        }
+                    }
+
+                    // 添加触摸和鼠标事件
+                    canvas.addEventListener('mousedown', handleStart);
+                    canvas.addEventListener('mousemove', handleMove);
+                    canvas.addEventListener('mouseup', handleEnd);
+                    canvas.addEventListener('mouseleave', handleEnd);
+
+                    canvas.addEventListener('touchstart', handleStart);
+                    canvas.addEventListener('touchmove', handleMove);
+                    canvas.addEventListener('touchend', handleEnd);
+                });
+            }
+
+            // 数组随机排序
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // 初始创建刮刮乐卡片
+            createScratchCards();
+
+            // 窗口大小变化时重新初始化刮刮乐
+            window.addEventListener('resize', initScratchCards);
+        });
+    </script>
+</body>
+
+</html>

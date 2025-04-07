@@ -1,0 +1,403 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --dark-color: #2c3e50;
+    --light-color: #ecf0f1;
+    --text-color: #333;
+    --border-radius: 8px;
+    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    color: var(--text-color);
+    background-color: #f5f7fa;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 标题和导航 */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 0;
+    overflow: hidden;
+}
+
+nav ul li {
+    flex: 1;
+    max-width: 200px;
+}
+
+nav ul li a {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: var(--dark-color);
+    text-align: center;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* 主要内容区 */
+main {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    min-height: 500px;
+}
+
+.section {
+    display: none;
+    padding: 30px;
+}
+
+.section.active {
+    display: block;
+}
+
+.section-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.section-header h2 {
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+/* 按钮样式 */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: #ccc;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+}
+
+.btn.secondary {
+    background-color: var(--secondary-color);
+}
+
+.btn.danger {
+    background-color: var(--danger-color);
+}
+
+.btn.large {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 随机点名部分 */
+.student-input {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+}
+
+.student-input h3 {
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+#student-list {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    resize: vertical;
+    font-size: 1rem;
+}
+
+.file-upload {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.file-upload input {
+    display: none;
+}
+
+.file-upload span {
+    margin-left: 10px;
+    font-size: 0.9rem;
+}
+
+.roll-call-panel {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 30px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+}
+
+#roll-call-display {
+    margin-bottom: 30px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#selected-student {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: 20px;
+    min-height: 70px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* 历史记录 */
+.history-panel {
+    padding: 20px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+}
+
+.history-panel h3 {
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+#history-list {
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: white;
+    border-radius: var(--border-radius);
+}
+
+#history-list li {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+#history-list li:last-child {
+    border-bottom: none;
+}
+
+/* 刮刮乐部分 */
+.prize-settings {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.setting-item label {
+    min-width: 100px;
+    font-weight: bold;
+}
+
+.setting-item input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border-radius: var(--border-radius);
+    border: 1px solid #ddd;
+}
+
+.setting-item input[type="range"] {
+    flex: 1;
+    max-width: 200px;
+}
+
+.scratch-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 30px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+}
+
+.card-wrapper {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+#scratch-card-result {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: var(--border-radius);
+    border: 2px solid gold;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-align: center;
+    padding: 20px;
+    z-index: 1;
+}
+
+#scratch-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    z-index: 2;
+}
+
+/* 页脚 */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px 0;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* 粒子动画容器 */
+#confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .card-wrapper {
+        width: 250px;
+        height: 160px;
+    }
+
+    #selected-student {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    nav ul li a {
+        padding: 10px;
+    }
+
+    .section {
+        padding: 15px;
+    }
+
+    .card-wrapper {
+        width: 200px;
+        height: 130px;
+    }
+
+    #selected-student {
+        font-size: 1.8rem;
+    }
+}

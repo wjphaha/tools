@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D名字球体</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #000000;
+            overflow: hidden;
+            color: white;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .sphere-container {
+            width: 100%;
+            height: 95vh;
+            position: relative;
+            perspective: 1500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .sphere {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease-out;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotateY(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotateY(10deg);
+            }
+        }
+
+        .name-tag {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            padding: 5px;
+            white-space: nowrap;
+            cursor: default;
+            transition: all 0.5s;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+            transform-origin: center center;
+            backface-visibility: visible;
+            transform-style: preserve-3d;
+        }
+
+        .selected-name {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .selected-name.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1.2);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.3);
+                text-shadow: 0 0 50px rgba(255, 255, 255, 1);
+            }
+        }
+
+        /* 粒子星空效果 */
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotateY(0deg);
+            }
+
+            to {
+                transform: rotateY(360deg);
+            }
+        }
+
+        @keyframes spinX {
+            0% {
+                transform: rotateX(0deg);
+            }
+
+            100% {
+                transform: rotateX(10deg);
+            }
+        }
+
+        @keyframes complex-spin {
+            0% {
+                transform: rotateY(0deg) rotateX(0deg);
+            }
+
+            25% {
+                transform: rotateY(90deg) rotateX(5deg);
+            }
+
+            50% {
+                transform: rotateY(180deg) rotateX(10deg);
+            }
+
+            75% {
+                transform: rotateY(270deg) rotateX(5deg);
+            }
+
+            100% {
+                transform: rotateY(360deg) rotateX(0deg);
+            }
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-start {
+            background-color: rgba(0, 100, 255, 0.5);
+        }
+
+        .btn-stop {
+            background-color: rgba(255, 50, 50, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sphere-container">
+        <div class="sphere" id="name-sphere"></div>
+        <div class="selected-name" id="selected-name"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" id="start-btn"><i class="bi bi-play-fill"></i>开始旋转</button>
+        <button class="btn btn-stop" id="stop-btn"><i class="bi bi-stop-fill"></i>点名</button>
+    </div>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const body = document.body;
+            const numStars = 200;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+
+                // 随机大小
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+
+                // 随机位置
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                star.style.left = `${posX}%`;
+                star.style.top = `${posY}%`;
+
+                // 随机动画延迟
+                star.style.animationDelay = `${Math.random() * 4}s`;
+
+                // 随机亮度
+                const opacity = Math.random() * 0.8 + 0.2;
+                star.style.opacity = opacity;
+
+                body.appendChild(star);
+            }
+        }
+
+        // 从localStorage获取学生名单，如果没有则使用默认名单
+        let students = [];
+
+        // 尝试从localStorage获取学生名单
+        try {
+            console.log("尝试从localStorage获取学生名单...");
+            const savedStudents = localStorage.getItem('studentNames');
+
+            if (savedStudents) {
+                console.log("从localStorage找到学生数据:", savedStudents);
+                students = JSON.parse(savedStudents);
+                console.log("解析后的学生数据:", students);
+            } else {
+                console.log("localStorage中没有找到学生数据，使用默认名单");
+                // 默认学生名单
+                students = [
+                    '张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十',
+                    '郑十一', '王十二', '刘十三', '陈十四', '杨十五', '黄十六', '周十七',
+                    '吴十八', '郑十九', '王二十', '马二一', '林二二', '冯二三', '朱二四'
+                ];
+            }
+        } catch (error) {
+            console.error("解析localStorage中的学生数据出错:", error);
+            // 发生错误时使用默认名单
+            students = [
+                '张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十',
+                '郑十一', '王十二', '刘十三', '陈十四', '杨十五', '黄十六', '周十七',
+                '吴十八', '郑十九', '王二十', '马二一', '林二二', '冯二三', '朱二四'
+            ];
+        }
+
+        // 确保至少有一些名字可以展示
+        if (!students || students.length === 0) {
+            console.warn("没有有效的学生数据，使用默认名单");
+            students = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十'];
+        }
+
+        let isRunning = false;
+        let sphere = document.getElementById('name-sphere');
+        let selectedName = document.getElementById('selected-name');
+
+        // 创建3D球体
+        function createNameSphere() {
+            // 清空球体
+            sphere.innerHTML = '';
+
+            // 计算每个点的位置
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.4; // 根据窗口大小自适应
+            const numPoints = students.length;
+            const phi = Math.PI * (3 - Math.sqrt(5)); // 黄金角
+
+            students.forEach((student, i) => {
+                const y = 1 - (i / (numPoints - 1)) * 2; // y 从 1 到 -1
+                const radiusAtY = Math.sqrt(1 - y * y); // 在该 y 的半径
+
+                const theta = phi * i; // 黄金角旋转
+
+                const x = Math.cos(theta) * radiusAtY;
+                const z = Math.sin(theta) * radiusAtY;
+
+                const nameTag = document.createElement('div');
+                nameTag.className = 'name-tag';
+                nameTag.textContent = student;
+
+                // 设置3D位置
+                const translateX = x * radius;
+                const translateY = y * radius;
+                const translateZ = z * radius;
+
+                // 计算标签到球心的方向向量
+                const dirX = x;
+                const dirY = y;
+                const dirZ = z;
+
+                // 计算标签应该面向的角度
+                const rotX = Math.atan2(dirY, Math.sqrt(dirX * dirX + dirZ * dirZ)) * (180 / Math.PI);
+                const rotY = Math.atan2(dirX, dirZ) * (180 / Math.PI);
+
+                // 设置变换，同时考虑位置和旋转，使标签沿球面弯曲
+                nameTag.style.transform = `translate3d(${translateX}px, ${translateY}px, ${translateZ}px) rotateY(${rotY}deg) rotateX(${-rotX}deg)`;
+
+                // 根据z位置调整大小和不透明度
+                const scale = 0.4 + (z + 1) * 0.6; // 略微减小缩放比例
+                const opacity = 0.3 + (z + 1) * 0.7; // 调整不透明度范围
+                nameTag.style.transform += ` scale(${scale})`;
+                nameTag.style.opacity = opacity;
+
+                // 根据位置给予不同颜色，增强3D效果
+                const hue = (i / numPoints) * 360;
+                nameTag.style.color = `hsl(${hue}, 100%, 85%)`;
+                nameTag.style.textShadow = `0 0 8px hsla(${hue}, 100%, 60%, 0.8)`;
+
+                sphere.appendChild(nameTag);
+            });
+        }
+
+        // 初始化
+        createStars();
+        createNameSphere();
+
+        // 开始按钮
+        document.getElementById('start-btn').addEventListener('click', function () {
+            if (!isRunning) {
+                isRunning = true;
+                selectedName.classList.remove('active');
+
+                // 启动旋转动画
+                sphere.style.animation = 'complex-spin 20s infinite linear';
+
+                // 隐藏选中的名字
+                selectedName.style.opacity = 0;
+                selectedName.style.transform = 'translate(-50%, -50%) scale(0.5)';
+
+                // 添加速度变化效果，逐渐加快
+                setTimeout(() => {
+                    sphere.style.animation = 'complex-spin 18s infinite linear';
+                }, 2000);
+
+                setTimeout(() => {
+                    sphere.style.animation = 'complex-spin 15s infinite linear';
+                }, 4000);
+
+                setTimeout(() => {
+                    sphere.style.animation = 'complex-spin 12s infinite linear';
+                }, 6000);
+            }
+        });
+
+        // 停止按钮
+        document.getElementById('stop-btn').addEventListener('click', function () {
+            if (isRunning) {
+                isRunning = false;
+
+                // 缓慢停止旋转
+                sphere.style.animation = 'spin 5s linear';
+                sphere.style.animationPlayState = 'paused';
+
+                // 随机选择学生
+                const randomIndex = Math.floor(Math.random() * students.length);
+                const chosenStudent = students[randomIndex];
+
+                // 显示选中的名字
+                selectedName.textContent = chosenStudent;
+                selectedName.classList.add('active');
+
+                // 动画效果
+                setTimeout(() => {
+                    selectedName.style.opacity = 1;
+                    selectedName.style.transform = 'translate(-50%, -50%) scale(1.2)';
+                }, 300);
+            }
+        });
+
+        // 窗口调整时重新创建球体
+        window.addEventListener('resize', createNameSphere);
+    </script>
+</body>
+
+</html>
